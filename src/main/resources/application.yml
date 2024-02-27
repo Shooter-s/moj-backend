@@ -46,3 +46,6 @@ springdoc:
       paths-to-match: '/**'
       packages-to-scan: com.shooter.mojbackend.controller
 
+# 沙箱实现类
+codesandbox:
+  type: 'example'

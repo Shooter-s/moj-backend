@@ -3,7 +3,7 @@ package com.shooter.mojbackend.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.shooter.mojbackend.model.dto.question.QuestionQueryRequest;
-import com.shooter.mojbackend.model.po.Ques;
+import com.shooter.mojbackend.model.po.Question;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.shooter.mojbackend.model.vo.QuestionVO;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * @author shooter
  * @since 2024-02-24
  */
-public interface IQuestionService extends IService<Ques> {
+public interface IQuestionService extends IService<Question> {
 
 
     /**
@@ -23,7 +23,7 @@ public interface IQuestionService extends IService<Ques> {
      * @param question
      * @param add
      */
-    void validQuestion(Ques question, boolean add);
+    void validQuestion(Question question, boolean add);
 
     /**
      * 获取查询条件
@@ -31,7 +31,7 @@ public interface IQuestionService extends IService<Ques> {
      * @param questionQueryRequest
      * @return
      */
-    QueryWrapper<Ques> getQueryWrapper(QuestionQueryRequest questionQueryRequest);
+    QueryWrapper<Question> getQueryWrapper(QuestionQueryRequest questionQueryRequest);
     
     /**
      * 获取题目封装
@@ -40,7 +40,7 @@ public interface IQuestionService extends IService<Ques> {
      * @param request
      * @return
      */
-    QuestionVO getQuestionVO(Ques question, HttpServletRequest request);
+    QuestionVO getQuestionVO(Question question, HttpServletRequest request);
 
     /**
      * 分页获取题目封装
@@ -49,6 +49,6 @@ public interface IQuestionService extends IService<Ques> {
      * @param request
      * @return
      */
-    Page<QuestionVO> getQuestionVOPage(Page<Ques> questionPage, HttpServletRequest request);
+    Page<QuestionVO> getQuestionVOPage(Page<Question> questionPage, HttpServletRequest request);
     
 }

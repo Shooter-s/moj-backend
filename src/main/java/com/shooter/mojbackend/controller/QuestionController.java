@@ -10,7 +10,7 @@ import com.shooter.mojbackend.enums.ResultCodeEnum;
 import com.shooter.mojbackend.exception.BusinessException;
 import com.shooter.mojbackend.model.dto.question.*;
 import com.shooter.mojbackend.model.dto.user.DeleteRequest;
-import com.shooter.mojbackend.model.po.Ques;
+import com.shooter.mojbackend.model.po.Question;
 import com.shooter.mojbackend.model.po.User;
 import com.shooter.mojbackend.model.vo.QuestionVO;
 import com.shooter.mojbackend.service.IQuestionService;
@@ -55,7 +55,7 @@ public class QuestionController {
         if (postAddRequest == null) {
             throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
         }
-        Ques post = new Ques();
+        Question post = new Question();
         BeanUtils.copyProperties(postAddRequest, post);
         List<String> tags = postAddRequest.getTags();
         if (tags != null) {
@@ -95,7 +95,7 @@ public class QuestionController {
         User user = userService.getLoginUser(request);
         long id = deleteRequest.getId();
         // 判断是否存在
-        Ques oldQuestion = questionService.getById(id);
+        Question oldQuestion = questionService.getById(id);
         ThrowUtils.throwIf(oldQuestion == null, ResultCodeEnum.NOT_FOUND_ERROR);
         // 仅本人或管理员可删除
         if (!oldQuestion.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
@@ -117,7 +117,7 @@ public class QuestionController {
         if (postUpdateRequest == null || postUpdateRequest.getId() <= 0) {
             throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
         }
-        Ques post = new Ques();
+        Question post = new Question();
         BeanUtils.copyProperties(postUpdateRequest, post);
         List<String> tags = postUpdateRequest.getTags();
         if (tags != null) {
@@ -135,14 +135,37 @@ public class QuestionController {
         questionService.validQuestion(post, false);
         long id = postUpdateRequest.getId();
         // 判断是否存在
-        Ques oldQuestion = questionService.getById(id);
+        Question oldQuestion = questionService.getById(id);
         ThrowUtils.throwIf(oldQuestion == null, ResultCodeEnum.NOT_FOUND_ERROR);
         boolean result = questionService.updateById(post);
         return Result.success(result);
     }
 
     /**
-     * 根据 id 获取
+     * 根据 id 获取题目信息
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/get")
+    public Result<Question> getQuestionById(long id, HttpServletRequest request) {
+        if (id <= 0) {
+            throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
+        }
+        Question question = questionService.getById(id);
+        if (question == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        // 不是本人或管理员，不能直接获取所有信息
+        if (!question.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
+            throw new BusinessException(ResultCodeEnum.NO_AUTH_ERROR);
+        }
+        return Result.success(question);
+    }
+
+    /**
+     * 根据 id 获取(脱敏后的信息)
      *
      * @param id
      * @return
@@ -152,7 +175,7 @@ public class QuestionController {
         if (id <= 0) {
             throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
         }
-        Ques post = questionService.getById(id);
+        Question post = questionService.getById(id);
         if (post == null) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND_ERROR);
         }
@@ -173,7 +196,7 @@ public class QuestionController {
         long size = postQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ResultCodeEnum.PARAMS_ERROR);
-        Page<Ques> postPage = questionService.page(new Page<>(current, size),
+        Page<Question> postPage = questionService.page(new Page<>(current, size),
                 questionService.getQueryWrapper(postQueryRequest));
         return Result.success(questionService.getQuestionVOPage(postPage, request));
     }
@@ -197,7 +220,7 @@ public class QuestionController {
         long size = postQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ResultCodeEnum.PARAMS_ERROR);
-        Page<Ques> postPage = questionService.page(new Page<>(current, size),
+        Page<Question> postPage = questionService.page(new Page<>(current, size),
                 questionService.getQueryWrapper(postQueryRequest));
         return Result.success(questionService.getQuestionVOPage(postPage, request));
     }
@@ -217,7 +240,7 @@ public class QuestionController {
         if (postEditRequest == null || postEditRequest.getId() <= 0) {
             throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
         }
-        Ques post = new Ques();
+        Question post = new Question();
         BeanUtils.copyProperties(postEditRequest, post);
         List<String> tags = postEditRequest.getTags();
         if (tags != null) {
@@ -236,7 +259,7 @@ public class QuestionController {
         User loginUser = userService.getLoginUser(request);
         long id = postEditRequest.getId();
         // 判断是否存在
-        Ques oldQuestion = questionService.getById(id);
+        Question oldQuestion = questionService.getById(id);
         ThrowUtils.throwIf(oldQuestion == null, ResultCodeEnum.NOT_FOUND_ERROR);
         // 仅本人或管理员可编辑
         if (!oldQuestion.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
@@ -246,5 +269,19 @@ public class QuestionController {
         return Result.success(result);
     }
 
+    /**
+     * 分页获取题目列表（仅管理员）
+     */
+    @PostMapping("/list/page")
+    public Result<Page<Question>> listQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
+                                                     HttpServletRequest request){
+        long current = questionQueryRequest.getCurrent();
+        long size = questionQueryRequest.getPageSize();
+        // 限制爬虫
+        ThrowUtils.throwIf(size > 20, ResultCodeEnum.PARAMS_ERROR);
+        Page<Question> postPage = questionService.page(new Page<>(current, size),
+                questionService.getQueryWrapper(questionQueryRequest));
+        return Result.success(postPage);
+    }
 
 }

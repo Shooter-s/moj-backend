@@ -9,9 +9,10 @@ import com.shooter.mojbackend.enums.QuestionSubmitLanguageEnum;
 import com.shooter.mojbackend.enums.QuestionSubmitStatusEnum;
 import com.shooter.mojbackend.enums.ResultCodeEnum;
 import com.shooter.mojbackend.exception.BusinessException;
+import com.shooter.mojbackend.judge.JudgeService;
 import com.shooter.mojbackend.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import com.shooter.mojbackend.model.dto.questionsubmit.QuestionSubmitQueryRequest;
-import com.shooter.mojbackend.model.po.Ques;
+import com.shooter.mojbackend.model.po.Question;
 import com.shooter.mojbackend.model.po.QuestionSubmit;
 import com.shooter.mojbackend.mapper.QuestionSubmitMapper;
 import com.shooter.mojbackend.model.po.User;
@@ -24,10 +25,12 @@ import com.shooter.mojbackend.utils.SqlUtils;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +50,10 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     @Resource
     private IQuestionService questionService;
 
+    @Resource
+    @Lazy // 懒加载防止循环依赖
+    private JudgeService judgeService;
+
     @Override
     public Long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, User loginUser) {
         //语言校验
@@ -57,7 +64,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         }
         Long questionId = questionSubmitAddRequest.getQuestionId();
         // 判断实体是否存在，根据类别获取实体
-        Ques question = questionService.getById(questionId);
+        Question question = questionService.getById(questionId);
         if (question == null) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND_ERROR);
         }
@@ -76,7 +83,10 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
             throw new BusinessException(ResultCodeEnum.SYSTEM_ERROR, "数据插入失败");
         }
         Long questionSubmitId = questionSubmit.getId();
-        // todo 异步判题
+        // 异步判题
+        CompletableFuture.runAsync(()->{
+            judgeService.doJudge(questionSubmitId);
+        });
         return questionSubmitId;
     }
 

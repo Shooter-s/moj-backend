@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.shooter.mojbackend.model.dto.question.QuestionQueryRequest;
 import com.shooter.mojbackend.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import com.shooter.mojbackend.model.dto.questionsubmit.QuestionSubmitQueryRequest;
-import com.shooter.mojbackend.model.po.Ques;
+import com.shooter.mojbackend.model.po.Question;
 import com.shooter.mojbackend.model.po.QuestionSubmit;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.shooter.mojbackend.model.po.User;

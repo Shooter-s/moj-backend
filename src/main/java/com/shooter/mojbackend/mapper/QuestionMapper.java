@@ -1,6 +1,6 @@
 package com.shooter.mojbackend.mapper;
 
-import com.shooter.mojbackend.model.po.Ques;
+import com.shooter.mojbackend.model.po.Question;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author shooter
  * @since 2024-02-24
  */
-public interface QuestionMapper extends BaseMapper<Ques> {
+public interface QuestionMapper extends BaseMapper<Question> {
 
 }

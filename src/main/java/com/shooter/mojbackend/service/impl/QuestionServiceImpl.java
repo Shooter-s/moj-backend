@@ -9,7 +9,7 @@ import com.shooter.mojbackend.constant.CommonConstant;
 import com.shooter.mojbackend.enums.ResultCodeEnum;
 import com.shooter.mojbackend.exception.BusinessException;
 import com.shooter.mojbackend.model.dto.question.QuestionQueryRequest;
-import com.shooter.mojbackend.model.po.Ques;
+import com.shooter.mojbackend.model.po.Question;
 import com.shooter.mojbackend.mapper.QuestionMapper;
 import com.shooter.mojbackend.model.po.User;
 import com.shooter.mojbackend.model.vo.QuestionVO;
@@ -35,13 +35,13 @@ import java.util.stream.Collectors;
  * @since 2024-02-24
  */
 @Service
-public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Ques> implements IQuestionService {
+public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> implements IQuestionService {
 
     @Resource
     private IUserService userService;
 
     @Override
-    public void validQuestion(Ques question, boolean add) {
+    public void validQuestion(Question question, boolean add) {
         if (question == null) {
             throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
         }
@@ -77,8 +77,8 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Ques> imple
      * 获取查询包装类（用户根据哪些字段查询，根据前端传来的请求对象，得到 mybatis 框架支持的查询 QueryWrapper 类）
      */
     @Override
-    public QueryWrapper<Ques> getQueryWrapper(QuestionQueryRequest questionQueryRequest) {
-        QueryWrapper<Ques> queryWrapper = new QueryWrapper<>();
+    public QueryWrapper<Question> getQueryWrapper(QuestionQueryRequest questionQueryRequest) {
+        QueryWrapper<Question> queryWrapper = new QueryWrapper<>();
         Long id = questionQueryRequest.getId();
         String title = questionQueryRequest.getTitle();
         String content = questionQueryRequest.getContent();
@@ -105,7 +105,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Ques> imple
     }
 
     @Override
-    public QuestionVO getQuestionVO(Ques question, HttpServletRequest request) {
+    public QuestionVO getQuestionVO(Question question, HttpServletRequest request) {
         QuestionVO questionVO = QuestionVO.objToVo(question);
         //关联查询用户信息(填充题目创建者的脱敏属性userVO)
         Long userId = question.getUserId();
@@ -120,14 +120,14 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Ques> imple
 
     //对分页查询得到的question集合进行脱敏处理
     @Override
-    public Page<QuestionVO> getQuestionVOPage(Page<Ques> questionPage, HttpServletRequest request) {
-        List<Ques> questionList = questionPage.getRecords();
+    public Page<QuestionVO> getQuestionVOPage(Page<Question> questionPage, HttpServletRequest request) {
+        List<Question> questionList = questionPage.getRecords();
         Page<QuestionVO> questionVOPage = new Page<>(questionPage.getCurrent(), questionPage.getSize(), questionPage.getTotal());
         if (CollectionUtil.isEmpty(questionList)){
             return questionVOPage;
         }
         //关联查询用户信息
-        Set<Long> userIdSet = questionList.stream().map(Ques::getUserId).collect(Collectors.toSet());
+        Set<Long> userIdSet = questionList.stream().map(Question::getUserId).collect(Collectors.toSet());
         // userId -> List<User>   1  ->  张三 zhangsan 12345678 ...
         Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream().collect(Collectors.groupingBy(User::getId));
         //对每一个 question -> questionVo

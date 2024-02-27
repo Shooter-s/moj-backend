@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.shooter.mojbackend.model.dto.question.JudgeConfig;
 import com.shooter.mojbackend.model.dto.questionsubmit.JudgeInfo;
-import com.shooter.mojbackend.model.po.Ques;
+import com.shooter.mojbackend.model.po.Question;
 import com.shooter.mojbackend.model.po.QuestionSubmit;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;

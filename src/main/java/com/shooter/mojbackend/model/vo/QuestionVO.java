@@ -3,7 +3,7 @@ package com.shooter.mojbackend.model.vo;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.shooter.mojbackend.model.dto.question.JudgeConfig;
-import com.shooter.mojbackend.model.po.Ques;
+import com.shooter.mojbackend.model.po.Question;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
@@ -91,11 +91,11 @@ public class QuestionVO implements Serializable {
      * 包装类转对象(对象存取的json数据是string类型，而vo中存的json数据为了方便前端获取内部属性，所以需要转换)
      * QuestionVO -> Question
      */
-    public static Ques voToObj(QuestionVO questionVO){
+    public static Question voToObj(QuestionVO questionVO){
         if (questionVO == null) {
             return null;
         }
-        Ques question = new Ques();
+        Question question = new Question();
         //把没有json和对象转换的属性直接拷贝过来
         BeanUtil.copyProperties(questionVO,question);
         //vo tags    List->String
@@ -115,7 +115,7 @@ public class QuestionVO implements Serializable {
      * 对象转包装类
      * Question -> QuestionVO
      */
-    public static QuestionVO objToVo(Ques question){
+    public static QuestionVO objToVo(Question question){
         if (question == null) {
             return null;
         }
