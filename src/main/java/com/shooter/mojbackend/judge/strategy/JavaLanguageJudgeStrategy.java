@@ -4,10 +4,11 @@ import cn.hutool.json.JSONUtil;
 import com.shooter.mojbackend.enums.JudgeInfoMessageEnum;
 import com.shooter.mojbackend.model.dto.question.JudgeCase;
 import com.shooter.mojbackend.model.dto.question.JudgeConfig;
-import com.shooter.mojbackend.model.dto.questionsubmit.JudgeInfo;
+import com.shooter.mojbackend.judge.codesandbox.model.JudgeInfo;
 import com.shooter.mojbackend.model.po.Question;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * ClassName: DefaultJudgeStrategy
@@ -34,8 +35,8 @@ public class JavaLanguageJudgeStrategy implements JudgeStrategy {
         List<String> outputList = context.getOutputList();
         Question question = context.getQuestion();
         JudgeInfo judgeInfo = context.getJudgeInfo();
-        Long memory = judgeInfo.getMemory();
-        Long time = judgeInfo.getTime();
+        Long memory = Optional.ofNullable(judgeInfo.getMemory()).orElse(0L);
+        Long time = Optional.ofNullable(judgeInfo.getTime()).orElse(0L);
         // 校验正确性
         JudgeInfoMessageEnum judgeInfoMessageEnum = JudgeInfoMessageEnum.ACCEPTED;
         JudgeInfo judgeInfoResponse = new JudgeInfo();

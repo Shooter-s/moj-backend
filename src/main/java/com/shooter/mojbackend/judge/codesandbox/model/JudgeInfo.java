@@ -1,4 +1,4 @@
-package com.shooter.mojbackend.model.dto.questionsubmit;
+package com.shooter.mojbackend.judge.codesandbox.model;
 
 import lombok.Data;
 

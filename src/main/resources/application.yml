@@ -48,4 +48,4 @@ springdoc:
 
 # 沙箱实现类
 codesandbox:
-  type: 'example'
+  type: remote

@@ -9,11 +9,16 @@ import com.shooter.mojbackend.constant.UserConstant;
 import com.shooter.mojbackend.enums.ResultCodeEnum;
 import com.shooter.mojbackend.exception.BusinessException;
 import com.shooter.mojbackend.model.dto.question.*;
+import com.shooter.mojbackend.model.dto.questionsubmit.QuestionSubmitAddRequest;
+import com.shooter.mojbackend.model.dto.questionsubmit.QuestionSubmitQueryRequest;
 import com.shooter.mojbackend.model.dto.user.DeleteRequest;
 import com.shooter.mojbackend.model.po.Question;
+import com.shooter.mojbackend.model.po.QuestionSubmit;
 import com.shooter.mojbackend.model.po.User;
+import com.shooter.mojbackend.model.vo.QuestionSubmitVO;
 import com.shooter.mojbackend.model.vo.QuestionVO;
 import com.shooter.mojbackend.service.IQuestionService;
+import com.shooter.mojbackend.service.IQuestionSubmitService;
 import com.shooter.mojbackend.service.IUserService;
 import com.shooter.mojbackend.utils.ThrowUtils;
 import jakarta.annotation.Resource;
@@ -38,6 +43,8 @@ public class QuestionController {
 
     @Resource
     private IUserService userService;
+    @Resource
+    private IQuestionSubmitService questionSubmitService;
 
     private final static Gson GSON = new Gson();
 
@@ -282,6 +289,32 @@ public class QuestionController {
         Page<Question> postPage = questionService.page(new Page<>(current, size),
                 questionService.getQueryWrapper(questionQueryRequest));
         return Result.success(postPage);
+    }
+
+
+    @PostMapping("/question_submit/do")
+    public Result<Long> doQuestionSubmit(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest,
+                                         HttpServletRequest request) {
+        if (questionSubmitAddRequest == null || questionSubmitAddRequest.getQuestionId() <= 0) {
+            throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
+        }
+        final User loginUser = userService.getLoginUser(request);
+        long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
+        return Result.success(questionSubmitId);
+    }
+
+    /**
+     *分页获取题目提交列表（除了管理员外，普通用户只能看到非答案、提交代码等公开信息）
+     */
+    @PostMapping("/question_submit/list/page")
+    public Result<Page<QuestionSubmitVO>> listQuestionSubmitByPage(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest, HttpServletRequest request){
+        long current = questionSubmitQueryRequest.getCurrent();
+        long pageSize = questionSubmitQueryRequest.getPageSize();
+        Page<QuestionSubmit> questionSubmitPage =  questionSubmitService.page(new Page<>(current,pageSize),
+                questionSubmitService.getQueryWrapper(questionSubmitQueryRequest));
+        User loginUser = userService.getLoginUser(request);
+        Page<QuestionSubmitVO> questionSubmitVOPage = questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage, loginUser);
+        return Result.success(questionSubmitVOPage);
     }
 
 }

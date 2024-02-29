@@ -29,10 +29,11 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2024-02-24
  */
 @RestController
-@RequestMapping("/question-submit")
+//@RequestMapping("/question-submit") // 注释掉，防止前端生成api
+@Deprecated
 public class QuestionSubmitController {
 
-    @Resource
+    /*@Resource
     private IUserService userService;
 
     @Resource
@@ -49,9 +50,9 @@ public class QuestionSubmitController {
         return Result.success(questionSubmitId);
     }
 
-    /**
+    *//**
      *分页获取题目提交列表（除了管理员外，普通用户只能看到非答案、提交代码等公开信息）
-     */
+     *//*
     @PostMapping("/list/page")
     public Result<Page<QuestionSubmitVO>> listQuestionSubmitByPage(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest, HttpServletRequest request){
         long current = questionSubmitQueryRequest.getCurrent();
@@ -61,6 +62,6 @@ public class QuestionSubmitController {
         User loginUser = userService.getLoginUser(request);
         Page<QuestionSubmitVO> questionSubmitVOPage = questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage, loginUser);
         return Result.success(questionSubmitVOPage);
-    }
+    }*/
 
 }

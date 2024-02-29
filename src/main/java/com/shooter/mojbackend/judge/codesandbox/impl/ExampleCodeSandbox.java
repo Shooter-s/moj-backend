@@ -5,7 +5,7 @@ import com.shooter.mojbackend.enums.QuestionSubmitStatusEnum;
 import com.shooter.mojbackend.judge.codesandbox.CodeSandbox;
 import com.shooter.mojbackend.judge.codesandbox.model.ExecuteCodeRequest;
 import com.shooter.mojbackend.judge.codesandbox.model.ExecuteCodeResponse;
-import com.shooter.mojbackend.model.dto.questionsubmit.JudgeInfo;
+import com.shooter.mojbackend.judge.codesandbox.model.JudgeInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;

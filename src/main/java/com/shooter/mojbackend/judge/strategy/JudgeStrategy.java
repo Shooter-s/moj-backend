@@ -1,6 +1,6 @@
 package com.shooter.mojbackend.judge.strategy;
 
-import com.shooter.mojbackend.model.dto.questionsubmit.JudgeInfo;
+import com.shooter.mojbackend.judge.codesandbox.model.JudgeInfo;
 
 /**
  * ClassName: JudgeStrategy

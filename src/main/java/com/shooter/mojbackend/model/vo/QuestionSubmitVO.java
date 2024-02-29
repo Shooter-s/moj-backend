@@ -2,15 +2,12 @@ package com.shooter.mojbackend.model.vo;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
-import com.shooter.mojbackend.model.dto.question.JudgeConfig;
-import com.shooter.mojbackend.model.dto.questionsubmit.JudgeInfo;
-import com.shooter.mojbackend.model.po.Question;
+import com.shooter.mojbackend.judge.codesandbox.model.JudgeInfo;
 import com.shooter.mojbackend.model.po.QuestionSubmit;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * ClassName: QuestionSubmitVO

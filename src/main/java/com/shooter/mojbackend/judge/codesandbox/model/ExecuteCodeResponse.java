@@ -1,6 +1,5 @@
 package com.shooter.mojbackend.judge.codesandbox.model;
 
-import com.shooter.mojbackend.model.dto.questionsubmit.JudgeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

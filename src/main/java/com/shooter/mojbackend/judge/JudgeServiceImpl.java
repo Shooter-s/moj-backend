@@ -1,7 +1,6 @@
 package com.shooter.mojbackend.judge;
 
 import cn.hutool.json.JSONUtil;
-import com.shooter.mojbackend.enums.JudgeInfoMessageEnum;
 import com.shooter.mojbackend.enums.QuestionSubmitStatusEnum;
 import com.shooter.mojbackend.enums.ResultCodeEnum;
 import com.shooter.mojbackend.exception.BusinessException;
@@ -10,23 +9,18 @@ import com.shooter.mojbackend.judge.codesandbox.CodeSandboxFactory;
 import com.shooter.mojbackend.judge.codesandbox.CodeSandboxProxy;
 import com.shooter.mojbackend.judge.codesandbox.model.ExecuteCodeRequest;
 import com.shooter.mojbackend.judge.codesandbox.model.ExecuteCodeResponse;
-import com.shooter.mojbackend.judge.strategy.DefaultJudgeStrategy;
 import com.shooter.mojbackend.judge.strategy.JudgeContext;
 import com.shooter.mojbackend.judge.strategy.JudgeManager;
-import com.shooter.mojbackend.judge.strategy.JudgeStrategy;
 import com.shooter.mojbackend.model.dto.question.JudgeCase;
-import com.shooter.mojbackend.model.dto.question.JudgeConfig;
-import com.shooter.mojbackend.model.dto.questionsubmit.JudgeInfo;
+import com.shooter.mojbackend.judge.codesandbox.model.JudgeInfo;
 import com.shooter.mojbackend.model.po.Question;
 import com.shooter.mojbackend.model.po.QuestionSubmit;
-import com.shooter.mojbackend.model.vo.QuestionSubmitVO;
 import com.shooter.mojbackend.service.IQuestionService;
 import com.shooter.mojbackend.service.IQuestionSubmitService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,6 +50,7 @@ public class JudgeServiceImpl implements JudgeService {
 
     @Override
     public QuestionSubmit doJudge(long questionSubmitId) {
+        // 获取数据库中的题目提交信息和题目信息
         QuestionSubmit questionSubmit = questionSubmitService.getById(questionSubmitId);
         if (questionSubmit == null){
             throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
@@ -65,12 +60,12 @@ public class JudgeServiceImpl implements JudgeService {
         if (question == null){
             throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
         }
-        //校验判题状态
+        //校验判题状态(特殊情况校验)
         if (!questionSubmit.getStatus().equals(QuestionSubmitStatusEnum.WAITING.getValue())){
             // 不可重复提交
             throw new BusinessException(ResultCodeEnum.OPERATION_ERROR);
         }
-        //更改判题（题目提交）的状态为 “判题中”，防止重复执行
+        //更改数据库中判题（题目提交）的状态为 “判题中”，防止重复执行
         QuestionSubmit questionSubmitUpdate = new QuestionSubmit();
         questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.RUNNING.getValue());
         questionSubmitUpdate.setId(questionSubmitId);
@@ -78,7 +73,7 @@ public class JudgeServiceImpl implements JudgeService {
         if (!update) {
             throw new BusinessException(ResultCodeEnum.SYSTEM_ERROR, "题目状态更新错误");
         }
-        // 补充判题参数
+        // 补充判题参数，为了传给代码沙箱
         ExecuteCodeRequest executeCodeRequest = new ExecuteCodeRequest();
         String judgeCaseStr = question.getJudgeCase();
         List<JudgeCase> judgeCases = JSONUtil.toList(judgeCaseStr, JudgeCase.class);
@@ -86,7 +81,7 @@ public class JudgeServiceImpl implements JudgeService {
         executeCodeRequest.setInputList(inputs);
         executeCodeRequest.setCode(questionSubmit.getCode());
         executeCodeRequest.setLanguage(questionSubmit.getLanguage());
-        // 执行沙箱判题(伪沙箱)
+        // 执行沙箱判题(根据value的值用不同的代码沙箱去实现)
         CodeSandbox codeSandbox = CodeSandboxFactory.newInstance(type);
         codeSandbox = new CodeSandboxProxy(codeSandbox);
         ExecuteCodeResponse executeCodeResponse = codeSandbox.executeCode(executeCodeRequest);
